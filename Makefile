@@ -7,39 +7,41 @@ LD = arm-none-eabi-ld
 OBJCOPY = arm-none-eabi-objcopy
 
 # Dirs
-ARCH_DIR = arch/arm/v7-a
 SCRIPT_DIR = scripts
-APP_DIR = apps
-DRIVERS_DIR = drivers
 BUILD_DIR = build
-
-# Flags
-CFLAGS = -mcpu=$(CPU) -g -Wall -nostdlib -Iinclude
-LDFLAGS = -T $(SCRIPT_DIR)/linker.ld
+INCLUDE_DIR = include
+SRC_DIRS = arch/arm/v7-a apps drivers lib
 
 # Files
-SRC_S = $(ARCH_DIR)/startup.s
-SRC_C = $(APP_DIR)/main.c
+SRC_C = $(shell find $(SRC_DIRS) -name '*.c')
+SRC_S = $(shell find $(SRC_DIRS) -name '*.s')
 
-OBJS = $(BUILD_DIR)/startup.o $(BUILD_DIR)/main.o $(BUILD_DIR)/uart.o
+OBJS = $(addprefix $(BUILD_DIR)/, $(notdir $(SRC_C:.c=.o)))
+OBJS += $(addprefix $(BUILD_DIR)/, $(notdir $(SRC_S:.s=.o)))
 
-all: $(BUILD_DIR) $(BUILD_DIR)/kernel.elf
+# Flags
+CFLAGS = -mcpu=$(CPU) -g -Wall -nostdlib -I$(INCLUDE_DIR) -fno-builtin
+LDFLAGS = -T $(SCRIPT_DIR)/linker.ld
+LIBGCC = $(shell $(CC) $(CFLAGS) -print-libgcc-file-name)
+
+vpath %.c $(SRC_DIRS)
+vpath %.s $(SRC_DIRS)
+
+
+all: $(BUILD_DIR) $(BUILD_DIR)/kernel.elf $(BUILD_DIR)/kernel.bin
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-$(BUILD_DIR)/startup.o: $(ARCH_DIR)/startup.s
+$(BUILD_DIR)/%.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/main.o: $(APP_DIR)/main.c
-	$(CC) $(CFLAGS) -c $< -o $@
-
-$(BUILD_DIR)/uart.o: $(DRIVERS_DIR)/uart.c
+$(BUILD_DIR)/%.o: %.s
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/kernel.elf: $(OBJS)
-	$(LD) $(LDFLAGS) $(OBJS) -o $@
-
+	$(LD) $(LDFLAGS) $(OBJS) $(LIBGCC) -o $@
+	
 $(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/kernel.elf
 	$(OBJCOPY) -O binary $< $@
 

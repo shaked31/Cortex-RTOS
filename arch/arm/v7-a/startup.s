@@ -31,7 +31,7 @@ bss_clear_loop:
     blt bss_clear_loop  // jumps back to start of loop
 
 bss_clear_done:
-    bl main
+    bl kernel_main
 
 halt:
     b halt
