@@ -16,9 +16,10 @@ SECTIONS
     /* Code section */
     .text :
     {
+        _vector_table_start = .;
         /* MUST - vector table (of interrupts) must be the first in memory
          * Ensures it is not removed by the linker's garbage collector */
-        KEEP(*(.vector_table))
+        KEEP(*(.vectors))
         *(.text)
         *(.text.*)
     } > RAM

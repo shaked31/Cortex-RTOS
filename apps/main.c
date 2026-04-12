@@ -5,6 +5,7 @@ int kernel_main() {
     uart_init();
 
     mini_printf("\n--- Cortex-RTOS Kernel Starting ---\n");
+    
 
     int test_num = 42;
     unsigned int test_hex = 0xDEADBEEF;

@@ -3,22 +3,28 @@
  * Entry point for Cortex-RTOS
  */
 
-.section .vector_table, "a"
+.section .text
 .globl _Reset
 
 _Reset:
     b reset_handler
-    b .                  /* 0x04: Undefined Instruction */
-    b .                  /* 0x08: Software Interrupt (SVC) */
-    b .                  /* 0x0C: Prefetch Abort */
-    b .                  /* 0x10: Data Abort */
-    b .                  /* 0x14: Reserved */
-    b .                  /* 0x18: IRQ (Interrupt Request) */
-    b .                  /* 0x1C: FIQ (Fast Interrupt Request) */
 
 
-.section .text
 reset_handler:
+    /* In ARMv7-A, for each mode, the cpu stores private value of registers */
+    cps #27 // change cpu mode to undefined instruction
+    ldr sp, =_stack_top // init the "undefined" private sp register
+
+    cps #19 // change cpu mode to supervisor
+    ldr sp, =_stack_top // init the "supervisor" private sp register
+
+    /* Set the VBAR (Vector Base Address Register) 
+     * The VBAR holds the base address of the exception vector table
+     * This allows to place the table at 0x10000 instead of 0x00 (qemu default)
+     */
+    ldr r0, =vector_table
+    mcr p15, 0, r0, c12, c0, 0
+    
     ldr sp, =_stack_top
     
     ldr r0, =_bss_start
