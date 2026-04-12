@@ -12,11 +12,20 @@ _Reset:
 
 reset_handler:
     /* In ARMv7-A, for each mode, the cpu stores private value of registers */
-    cps #27 // change cpu mode to undefined instruction
-    ldr sp, =_stack_top // init the "undefined" private sp register
 
-    cps #19 // change cpu mode to supervisor
-    ldr sp, =_stack_top // init the "supervisor" private sp register
+    // Init stack for undefined mode
+    cps #27
+    ldr sp, =_stack_top
+    bic sp, sp, #0x7
+
+    // Init stack for IRQ mode
+    cps #18
+    ldr sp, =_stack_top
+    bic sp, sp, #0x7
+
+    // Init stack for supervisor mode
+    cps #19
+    ldr sp, =_stack_top
 
     /* Set the VBAR (Vector Base Address Register) 
      * The VBAR holds the base address of the exception vector table

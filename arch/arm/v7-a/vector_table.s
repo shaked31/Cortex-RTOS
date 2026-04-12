@@ -22,11 +22,16 @@ _undef_addr:    .word undefined_handler
 _svc_addr:      .word svc_handler
 _prefetch_addr: .word prefetch_handler
 _data_addr:     .word data_abort_handler
-_irq_addr:      .word irq_handler
+_irq_addr:      .word irq_wrapper
 _fiq_addr:      .word fiq_handler
 
+irq_wrapper:
+    sub lr, lr, #4
+    push {r0-r3, r12, lr}
+    bl irq_handler
+    pop {r0-r3, r12, lr}
+    movs pc, lr
 
 svc_handler:      b .
 prefetch_handler: b .
-irq_handler:      b .
 fiq_handler:      b .
