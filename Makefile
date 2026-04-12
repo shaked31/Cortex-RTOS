@@ -49,6 +49,9 @@ $(BUILD_DIR)/kernel.bin: $(BUILD_DIR)/kernel.elf
 run: all
 	qemu-system-arm -M realview-pb-a8 -kernel $(BUILD_DIR)/kernel.elf -audio none -nographic
 
+qemu: all
+	qemu-system-arm -M realview-pb-a8 -kernel $(BUILD_DIR)/kernel.elf -audio none
+	
 clean:
 	rm -rf $(BUILD_DIR)
 
