@@ -10,7 +10,7 @@ OBJCOPY = arm-none-eabi-objcopy
 SCRIPT_DIR = scripts
 BUILD_DIR = build
 INCLUDE_DIR = include
-SRC_DIRS = arch/arm/v7-a apps drivers lib
+SRC_DIRS = arch/arm/v7-a apps drivers lib kernel
 
 # Files
 SRC_C = $(shell find $(SRC_DIRS) -name '*.c')

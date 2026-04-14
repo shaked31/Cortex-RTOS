@@ -4,6 +4,7 @@
 #include <stdint.h>
 
 #define TIMER0_BASE 0x10011000  // SP804 timer0 base address on RealView PB A8
+#define TIMER0_INT_VALUE 36 // Timer0 interrupt value for RealView PB A8
 
 typedef struct {
     volatile uint32_t load;     // 0x00: Load register

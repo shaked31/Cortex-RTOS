@@ -27,10 +27,21 @@ _fiq_addr:      .word fiq_handler
 
 irq_wrapper:
     sub lr, lr, #4
-    push {r0-r3, r12, lr}
-    bl irq_handler
-    pop {r0-r3, r12, lr}
-    movs pc, lr
+
+    srsdb sp!, #19 // save PC & CPSR directly into the supervisor mode stack
+    cps #19 // switch CPU to supervisor mode
+
+    push {r0-r12, lr}
+
+    // pass sp as the first arg to scheduler and call the function
+    mov r0, sp
+    bl scheduler
+
+    mov sp, r0 // load the new sp after function
+    pop {r0-r12, lr} // restore the new task's general purpose registers
+
+    rfeia sp! // pops the PC and CPSR from the stack and jumps to the new task
+
 
 svc_handler:      b .
 prefetch_handler: b .
