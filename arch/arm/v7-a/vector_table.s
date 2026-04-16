@@ -42,7 +42,20 @@ irq_wrapper:
 
     rfeia sp! // pops the PC and CPSR from the stack and jumps to the new task
 
+svc_handler:
+    // were already in svc mode
+    srsdb sp!, #19 // save PC & CPSR directly into the supervisor mode stack
 
-svc_handler:      b .
+    // pass sp as the first arg to scheduler and call the function
+    push {r0-r12, lr}
+    bl scheduler
+
+    // load the new sp after function
+    mov sp, r0
+    pop {r0-r12, lr}
+
+    // pops the PC and CPSR from the stack and jumps to the new task
+    rfeia sp!
+
 prefetch_handler: b .
 fiq_handler:      b .

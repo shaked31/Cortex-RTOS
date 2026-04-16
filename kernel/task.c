@@ -82,3 +82,19 @@ uint32_t scheduler(uint32_t curr_sp) {
 
     return (uint32_t)tasks[curr_task].sp;
 }
+
+int task_get_current() {
+    if (curr_task != -1)
+        return &tasks[curr_task];
+    return 0;
+}
+
+void task_block_current() {
+    if (curr_task != -1)
+        tasks[curr_task].state = TASK_BLOCKED;
+}
+
+void task_unblock(int id) {
+    if (id >= 0 && id <= MAX_TASKS)
+        tasks[curr_task].state = TASK_READY;
+}
