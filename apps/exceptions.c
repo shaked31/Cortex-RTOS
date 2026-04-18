@@ -16,7 +16,7 @@ void irq_handler() {
     uint32_t irq_id = GICC_IAR;
     mini_printf("[IRQ] ID: %d was triggered\n", irq_id);
 
-    if (irq_id == 36) {
+    if (irq_id == TIMER0_INT_VALUE) {
         mini_printf("Tick from timer!\n");
 
         // Clear the timer interrupt

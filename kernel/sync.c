@@ -1,5 +1,6 @@
 #include "../include/kernel/sync.h"
 #include "../include/kernel/task.h"
+#include "../include/lib/stdio.h"
 #include "../arch/arm/v7-a/cpu.h"
 
 void mutex_init(mutex_t* m) {
@@ -13,9 +14,15 @@ void mutex_lock(mutex_t* m) {
     disable_interrupts();  // prevent timer from interrupting the lock
     tcb_t* curr_task = task_get_current();
 
+    if (curr_task == 0) {
+        mini_printf("Error: tried to take mutex outside of a task, halting...");
+        enable_interrupts();
+        while(1); // halt the system
+    }
+
     if (m->lock_state == LOCK_FREE) {
         m->lock_state = LOCK_TAKEN;
-        m->owner_task_id = curr_task ? curr_task->id : -1;
+        m->owner_task_id = curr_task->id;
         enable_interrupts();
     }
 
@@ -50,12 +57,14 @@ void mutex_unlock(mutex_t* m) {
         next_task->next = 0;
         m->owner_task_id = next_task->id;
         next_task->state = TASK_READY;
+        
+        enable_interrupts();
+        task_yield();
     }
 
     else { // no tasks waiting
         m->lock_state = LOCK_FREE;
         m->owner_task_id = -1;
+        enable_interrupts();
     }
-
-    enable_interrupts();
 }

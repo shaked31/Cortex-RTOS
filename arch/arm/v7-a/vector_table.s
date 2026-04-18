@@ -33,8 +33,12 @@ irq_wrapper:
 
     push {r0-r12, lr}
 
-    // pass sp as the first arg to scheduler and call the function
+    /* pass sp as the first arg to scheduler
+     * second arg tells scheduler it was called from irq
+     * call the function scheduler
+    */
     mov r0, sp
+    mov r1, #1
     bl scheduler
 
     mov sp, r0 // load the new sp after function
@@ -48,6 +52,9 @@ svc_handler:
 
     // pass sp as the first arg to scheduler and call the function
     push {r0-r12, lr}
+
+    mov r0, sp
+    mov r1, #0
     bl scheduler
 
     // load the new sp after function

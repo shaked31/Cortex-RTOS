@@ -8,16 +8,13 @@
 
 mutex_t uart_mutex;
 
-void delay() {
-    for (volatile int i = 0 ; i < 100000000 ; i++) {}
-}
-
 void task1() {
     while (1) {
         mutex_lock(&uart_mutex);
         mini_printf("Task A is being exectuted right now!\n");
         mutex_unlock(&uart_mutex);
-        delay();
+
+        task_sleep(50);
     }
 }
 
@@ -26,7 +23,8 @@ void task2() {
         mutex_lock(&uart_mutex);
         mini_printf("Task B is being exectuted right now!\n");
         mutex_unlock(&uart_mutex);
-        delay();
+
+        task_sleep(50);
     }
 }
 
@@ -42,8 +40,8 @@ int kernel_main() {
     task_create(task1);
     task_create(task2);
 
-    timer_init(1000000);
-    gic_enable_interrupt(36);
+    timer_init(10000);
+    gic_enable_interrupt(TIMER0_INT_VALUE);
 
     enable_interrupts();
     
