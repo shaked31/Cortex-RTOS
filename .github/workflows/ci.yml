@@ -18,7 +18,7 @@ jobs:
           run: docker build -t cortex-rtos-ci .
         
         - name: Compile Kernel
-          run : docker run -it --rm cortex-rtos-ci make all
+          run : docker run --rm cortex-rtos-ci make all
 
         - name: Run Kernel
-          run: timeout 10 docker run -it --rm cortex-rtos-ci
+          run: timeout 10 docker run --rm cortex-rtos-ci
