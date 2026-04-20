@@ -21,4 +21,11 @@ jobs:
           run : docker run --rm cortex-rtos-ci make all
 
         - name: Run Kernel
-          run: timeout 10 docker run --rm cortex-rtos-ci
+          run: |
+            timeout 10 docker run --rm cortex-rtos-ci || 
+              if [$? -eq 124];
+                then echo "Kernel ran successfully for 10 seconds and was terminated.";
+                exit 0;
+              else 
+                exit 1;
+            fi
